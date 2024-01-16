@@ -6,6 +6,10 @@ const { verify } = require("../controllers/Verify.js");
 const {
   inapGralAll,
   inapGral01All,
+  inapGral0101All,
+  inapGral0102All,
+  inapGral0103All,
+  inapGral010301All,
 } = require("../controllers/Controller_InapGral.js");
 const { Login } = require("../controllers/Controller_Login.js");
 
@@ -23,6 +27,19 @@ router.post("/inapGralAll", (req, res) => {
 
 router.post("/inapGral01All", (req, res) => {
   inapGral01All(req, res);
+});
+
+router.post("/inapGral0101All", (req, res) => {
+  inapGral0101All(req, res);
+});
+router.post("/inapGral0102All", (req, res) => {
+  inapGral0102All(req, res);
+});
+router.post("/inapGral0103All", (req, res) => {
+  inapGral0103All(req, res);
+});
+router.post("/inapGral010301All", (req, res) => {
+  inapGral010301All(req, res);
 });
 
 module.exports = router;
