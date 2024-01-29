@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const multer = require("multer");
 const { verify } = require("../controllers/Verify.js");
 
 const {
@@ -12,6 +12,11 @@ const {
   inapGral010301All,
 } = require("../controllers/Controller_InapGral.js");
 const { Login } = require("../controllers/Controller_Login.js");
+
+const { saveFile } = require("../controllers/Controller_Files.js");
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.post("/login", (req, res) => {
   Login(req, res);
@@ -40,6 +45,10 @@ router.post("/inapGral0103All", (req, res) => {
 });
 router.post("/inapGral010301All", (req, res) => {
   inapGral010301All(req, res);
+});
+
+router.post("/saveFile", upload.single("file"), (req, res) => {
+  saveFile(req, res);
 });
 
 module.exports = router;
