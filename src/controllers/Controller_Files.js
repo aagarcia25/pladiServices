@@ -16,8 +16,8 @@ const createFolderIfNotExists = async (folderPath) => {
 const saveFile = async (req, res) => {
   try {
     const nombreCarpeta = "test";
-    const rutaCarpeta = path.join(ruta, nombreCarpeta);
 
+    const rutaCarpeta = path.join(ruta, nombreCarpeta);
     await createFolderIfNotExists(rutaCarpeta);
 
     if (!req.file) {
@@ -34,13 +34,59 @@ const saveFile = async (req, res) => {
     }
 
     const rutaArchivo = path.join(rutaCarpeta, nombreArchivo);
-
     await fs.writeFile(rutaArchivo, contenido);
 
+    const result = await utils.executeQuery("CALL sp_files(?,?,?,?,?,?)", [
+      1,
+      req.body.P_IDOWNER || null,
+      req.body.P_CreadoPor || null,
+      nombreArchivo || null,
+      rutaArchivo || null,
+      null,
+    ]);
+
+    if (result.length > 2) {
+      const responseData = utils.buildResponse(
+        result[0],
+        true,
+        result[1][0].Respuesta,
+        result[1][0].Mensaje
+      );
+
+      res.status(200).json(responseData);
+    } else {
+      const responseData = utils.buildResponse(
+        [],
+        true,
+        result[0][0].Respuesta,
+        result[0][0].Mensaje
+      );
+      res.status(200).json(responseData);
+    }
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+const getFile = async (req, res) => {
+  try {
+    // if (!req.body.ruta) {
+    //   throw new Error("No se proporcionó la ruta del archivo");
+    // }
+
+    // if (!req.body.nombre) {
+    //   throw new Error("No se proporcionó el nombre del archivo");
+    // }
+
+    const filePath = path.join("C:\\FILES\\test", "DASA-0082-2023.pdf");
+
+    const fileContent = await fs.readFile(filePath, { encoding: "base64" });
+
     const responseData = utils.buildResponse(
-      { rutaArchivo, nombreArchivo },
+      { FILE: fileContent, TIPO: ".pdf" },
       true,
-      "001",
+      200,
       "Exito"
     );
     res.status(200).json(responseData);
@@ -50,4 +96,4 @@ const saveFile = async (req, res) => {
   }
 };
 
-module.exports = { saveFile };
+module.exports = { saveFile, getFile };

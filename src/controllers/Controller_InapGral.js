@@ -235,4 +235,39 @@ module.exports = {
       res.status(500).json(responseData);
     }
   },
+  adminfiles: async (req, res) => {
+    try {
+      console.log(req.body);
+      const result = await utils.executeQuery("CALL sp_files(?,?,?,?,?,?)", [
+        req.body.TIPO,
+        req.body.P_IDOWNER || null,
+        req.body.P_CreadoPor || null,
+        req.body.P_Nombre || null,
+        req.body.P_Ruta || null,
+        req.body.P_ID || null,
+      ]);
+
+      if (result.length > 2) {
+        const responseData = utils.buildResponse(
+          result[0],
+          true,
+          result[1][0].Respuesta,
+          result[1][0].Mensaje
+        );
+
+        res.status(200).json(responseData);
+      } else {
+        const responseData = utils.buildResponse(
+          [],
+          true,
+          result[0][0].Respuesta,
+          result[0][0].Mensaje
+        );
+        res.status(200).json(responseData);
+      }
+    } catch (error) {
+      const responseData = utils.buildResponse(null, false, 500, error.message);
+      res.status(500).json(responseData);
+    }
+  },
 };
