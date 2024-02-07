@@ -71,15 +71,16 @@ const saveFile = async (req, res) => {
 
 const getFile = async (req, res) => {
   try {
-    // if (!req.body.ruta) {
-    //   throw new Error("No se proporcionó la ruta del archivo");
-    // }
+    console.log(req.body);
+    if (!req.body.P_ROUTE) {
+      throw new Error("No se proporcionó la ruta del archivo");
+    }
 
-    // if (!req.body.nombre) {
-    //   throw new Error("No se proporcionó el nombre del archivo");
-    // }
+    if (!req.body.P_NOMBRE) {
+      throw new Error("No se proporcionó el nombre del archivo");
+    }
 
-    const filePath = path.join("C:\\FILES\\test", "DASA-0082-2023.pdf");
+    const filePath = path.join(req.body.P_ROUTE);
 
     const fileContent = await fs.readFile(filePath, { encoding: "base64" });
 

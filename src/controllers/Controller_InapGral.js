@@ -12,7 +12,6 @@ module.exports = {
           req.body.P_CreadoPor || null,
           req.body.P_FechaConveniogrlinicio || null,
           req.body.P_FechaConveniogrlfin || null,
-
           req.body.P_NombreConvenio || null,
         ]
       );
