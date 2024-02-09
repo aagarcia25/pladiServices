@@ -1,6 +1,7 @@
 const utils = require("../utils/responseBuilder.js");
 const fs = require("fs").promises;
 const path = require("path");
+const dayjs = require("dayjs");
 
 const ruta = process.env.APP_ROUTE_FILE;
 const xlsx = require("xlsx");
@@ -107,7 +108,13 @@ const migrafile = async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     // Convertir el contenido de la hoja de cálculo a un objeto JavaScript
-    const jsonData = xlsx.utils.sheet_to_json(sheet);
+
+    const jsonData = xlsx.utils.sheet_to_json(sheet, {
+      dateNF: "YYYY-MM-DD", // Formato de fecha (puedes ajustar según el formato de tu archivo)
+      raw: false, // Establecer en true si quieres que las fechas se mantengan como números
+      cellDates: true, // Habilitar para convertir automáticamente las fechas en objetos Date
+    });
+
     jsonData.forEach(async (row, index) => {
       console.log(`Fila ${index + 1}:`, row);
       // Aquí puedes realizar acciones con cada fila del archivo Excel
@@ -118,28 +125,32 @@ const migrafile = async (req, res) => {
             1,
             null,
             req.body.P_CreadoPor || null,
-            new Date(row.FECHA_INICIO) || null,
-            new Date(row.FECHA_INICIO) || null,
+            row.FECHA_INICIO || null,
+            row.FECHA_INICIO || null,
             row.CONVENIO || null,
           ]
         );
       } else if (codigo == 1) {
-        const result = await utils.executeQuery(
-          "CALL sp_inapgral_01_CRUD(?,?,?,?,?,?,?,?,?,?)",
-          [
-            1,
-            null,
-            req.body.P_ID,
-            req.body.P_CreadoPor,
-            new Date(row.FECHA_INICIAL) || null,
-            new Date(row.FECHA_FIN) || null,
-            row.NOMBRE,
-            row.OBJETIVO,
-            row.MONTO,
-            new Date(row.FECHA_FINIQUITO) || null,
-          ]
-        );
-        console.log(result);
+        try {
+          const result = await utils.executeQuery(
+            "CALL sp_inapgral_01_CRUD(?,?,?,?,?,?,?,?,?,?)",
+            [
+              1,
+              null,
+              req.body.P_ID,
+              req.body.P_CreadoPor,
+              dayjs(row.FECHA_INICIAL, "MM/DD/YY").format("YYYY-MM-DD"),
+              dayjs(row.FECHA_FIN, "MM/DD/YY").format("YYYY-MM-DD"),
+              row.NOMBRE,
+              row.OBJETIVO,
+              row.MONTO,
+              dayjs(row.FECHA_FINIQUITO, "MM/DD/YY").format("YYYY-MM-DD"),
+            ]
+          );
+          console.log(result);
+        } catch (error) {
+          console.log(error.message);
+        }
       }
     });
 
