@@ -3,7 +3,7 @@ const fs = require("fs").promises;
 const path = require("path");
 
 const ruta = process.env.APP_ROUTE_FILE;
-
+const xlsx = require("xlsx");
 const createFolderIfNotExists = async (folderPath) => {
   try {
     await fs.access(folderPath);
@@ -15,10 +15,7 @@ const createFolderIfNotExists = async (folderPath) => {
 
 const saveFile = async (req, res) => {
   try {
-    const nombreCarpeta = "test";
-
-    const rutaCarpeta = path.join(ruta, nombreCarpeta);
-    await createFolderIfNotExists(rutaCarpeta);
+    await createFolderIfNotExists(ruta);
 
     if (!req.file) {
       throw new Error("No se proporcionó ningún archivo en la solicitud.");
@@ -97,4 +94,71 @@ const getFile = async (req, res) => {
   }
 };
 
-module.exports = { saveFile, getFile };
+const migrafile = async (req, res) => {
+  try {
+    console.log(req.body);
+
+    if (!req.body.P_TIPO) {
+      throw new Error("No se proporcionó el Tipo");
+    }
+
+    if (!req.file) {
+      throw new Error("No se proporcionó ningún archivo en la solicitud.");
+    }
+    const codigo = req.body.P_TIPO;
+    const contenido = req.file.buffer;
+    const workbook = xlsx.read(contenido, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    // Convertir el contenido de la hoja de cálculo a un objeto JavaScript
+    const jsonData = xlsx.utils.sheet_to_json(sheet);
+    jsonData.forEach(async (row, index) => {
+      console.log(`Fila ${index + 1}:`, row);
+      // Aquí puedes realizar acciones con cada fila del archivo Excel
+      if (codigo == 0) {
+        /*const result = await utils.executeQuery(
+          "CALL sp_inapgral_CRUD(?,?,?,?,?,?)",
+          [
+            1,
+            null,
+            req.body.P_CreadoPor || null,
+            new Date(row.FECHA_INICIO) || null,
+            new Date(row.FECHA_INICIO) || null,
+            row.CONVENIO || null,
+          ]
+        );
+        console.log(result);*/
+      } else if (codigo == 1) {
+        const result = await utils.executeQuery(
+          "CALL sp_inapgral_01_CRUD(?,?,?,?,?,?,?,?,?,?)",
+          [
+            1,
+            null,
+            req.body.P_ID,
+            req.body.P_CreadoPor,
+            new Date(row.FECHA_INICIAL) || null,
+            new Date(row.FECHA_FIN) || null,
+            row.NOMBRE,
+            row.OBJETIVO,
+            row.MONTO,
+            new Date(row.FECHA_FINIQUITO) || null,
+          ]
+        );
+        console.log(result);
+      }
+    });
+
+    const responseData = utils.buildResponse(
+      "Migracion Completa",
+      true,
+      200,
+      "Exito"
+    );
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+module.exports = { saveFile, getFile, migrafile };

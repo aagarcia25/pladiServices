@@ -1,5 +1,7 @@
 const utils = require("../utils/responseBuilder.js");
-
+const path = require("path");
+const ruta = process.env.APP_ROUTE_FILE;
+const fs = require("fs").promises;
 module.exports = {
   inapGralAll: async (req, res) => {
     try {
@@ -196,21 +198,36 @@ module.exports = {
       res.status(500).json(responseData);
     }
   },
+
   inapGral010301All: async (req, res) => {
     try {
+      if (!req.file) {
+        throw new Error("No se proporcionó ningún archivo en la solicitud.");
+      }
+
+      const contenido = req.file.buffer;
+      const nombreArchivo = req.body.nombreArchivo;
+
+      const rutaArchivo = path.join(ruta, nombreArchivo);
+      await fs.writeFile(rutaArchivo, contenido);
+
       console.log(req.body);
+      console.log(rutaArchivo);
+      console.log(nombreArchivo);
       const result = await utils.executeQuery(
-        "CALL sp_inapgral_01_03_01_CRUD(?,?,?,?,?,?)",
+        "CALL sp_inapgral_01_03_01_CRUD(?,?,?,?,?,?,?,?)",
         [
           req.body.TIPO,
           req.body.P_Id,
-          req.body.P_IdGral0103,
-          req.body.P_CreadoPor,
+          req.body.P_IdGral0103 || null,
+          req.body.P_CreadoPor || null,
           req.body.P_FechaPresupuesto,
           req.body.P_FechaPAgo,
+          rutaArchivo,
+          nombreArchivo,
         ]
       );
-
+      console.log(result);
       if (result.length > 2) {
         const responseData = utils.buildResponse(
           result[0],
@@ -234,6 +251,7 @@ module.exports = {
       res.status(500).json(responseData);
     }
   },
+
   adminfiles: async (req, res) => {
     try {
       console.log(req.body);

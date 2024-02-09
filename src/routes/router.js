@@ -14,7 +14,11 @@ const {
 } = require("../controllers/Controller_InapGral.js");
 const { Login } = require("../controllers/Controller_Login.js");
 
-const { saveFile, getFile } = require("../controllers/Controller_Files.js");
+const {
+  saveFile,
+  getFile,
+  migrafile,
+} = require("../controllers/Controller_Files.js");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -44,7 +48,7 @@ router.post("/inapGral0102All", (req, res) => {
 router.post("/inapGral0103All", (req, res) => {
   inapGral0103All(req, res);
 });
-router.post("/inapGral010301All", (req, res) => {
+router.post("/inapGral010301All", upload.single("file"), (req, res) => {
   inapGral010301All(req, res);
 });
 router.post("/adminfiles", (req, res) => {
@@ -57,6 +61,10 @@ router.post("/saveFile", upload.single("file"), (req, res) => {
 
 router.post("/getFile", upload.single("file"), (req, res) => {
   getFile(req, res);
+});
+
+router.post("/migradata", upload.single("file"), (req, res) => {
+  migrafile(req, res);
 });
 
 module.exports = router;
