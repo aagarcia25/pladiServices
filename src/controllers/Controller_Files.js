@@ -9,7 +9,6 @@ const createFolderIfNotExists = async (folderPath) => {
     await fs.access(folderPath);
   } catch (error) {
     await fs.mkdir(folderPath, { recursive: true });
-    console.log("Carpeta creada exitosamente:", folderPath);
   }
 };
 
@@ -68,7 +67,6 @@ const saveFile = async (req, res) => {
 
 const getFile = async (req, res) => {
   try {
-    console.log(req.body);
     if (!req.body.P_ROUTE) {
       throw new Error("No se proporcionó la ruta del archivo");
     }
@@ -96,8 +94,6 @@ const getFile = async (req, res) => {
 
 const migrafile = async (req, res) => {
   try {
-    console.log(req.body);
-
     if (!req.body.P_TIPO) {
       throw new Error("No se proporcionó el Tipo");
     }
@@ -116,7 +112,7 @@ const migrafile = async (req, res) => {
       console.log(`Fila ${index + 1}:`, row);
       // Aquí puedes realizar acciones con cada fila del archivo Excel
       if (codigo == 0) {
-        /*const result = await utils.executeQuery(
+        const result = await utils.executeQuery(
           "CALL sp_inapgral_CRUD(?,?,?,?,?,?)",
           [
             1,
@@ -127,7 +123,6 @@ const migrafile = async (req, res) => {
             row.CONVENIO || null,
           ]
         );
-        console.log(result);*/
       } else if (codigo == 1) {
         const result = await utils.executeQuery(
           "CALL sp_inapgral_01_CRUD(?,?,?,?,?,?,?,?,?,?)",

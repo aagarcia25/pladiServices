@@ -5,7 +5,6 @@ const fs = require("fs").promises;
 module.exports = {
   inapGralAll: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_CRUD(?,?,?,?,?,?)",
         [
@@ -43,7 +42,6 @@ module.exports = {
   },
   inapGral01All: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_01_CRUD(?,?,?,?,?,?,?,?,?,?)",
         [
@@ -85,7 +83,6 @@ module.exports = {
   },
   inapGral0101All: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_01_01_CRUD(?,?,?,?,?,?)",
         [
@@ -123,7 +120,6 @@ module.exports = {
   },
   inapGral0102All: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_01_02_CRUD(?,?,?,?,?,?)",
         [
@@ -161,7 +157,6 @@ module.exports = {
   },
   inapGral0103All: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_01_03_CRUD(?,?,?,?,?,?,?)",
         [
@@ -211,9 +206,6 @@ module.exports = {
       const rutaArchivo = path.join(ruta, nombreArchivo);
       await fs.writeFile(rutaArchivo, contenido);
 
-      console.log(req.body);
-      console.log(rutaArchivo);
-      console.log(nombreArchivo);
       const result = await utils.executeQuery(
         "CALL sp_inapgral_01_03_01_CRUD(?,?,?,?,?,?,?,?)",
         [
@@ -227,7 +219,6 @@ module.exports = {
           nombreArchivo,
         ]
       );
-      console.log(result);
       if (result.length > 2) {
         const responseData = utils.buildResponse(
           result[0],
@@ -254,7 +245,6 @@ module.exports = {
 
   adminfiles: async (req, res) => {
     try {
-      console.log(req.body);
       const result = await utils.executeQuery("CALL sp_files(?,?,?,?,?,?)", [
         req.body.TIPO,
         req.body.P_IDOWNER || null,

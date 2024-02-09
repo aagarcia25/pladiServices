@@ -2,7 +2,6 @@ const utils = require("../utils/responseBuilder.js");
 module.exports = {
   Login: async (req, res) => {
     try {
-      console.log(req.body.tipo);
       const result = await utils.executeQuery("CALL sp_login(?,?)", [
         req.body.P_Usuario,
         req.body.P_Password,
@@ -10,8 +9,6 @@ module.exports = {
 
       if (result.length > 2) {
         const data = result;
-        //console.log("data[0] " + JSON.stringify(data[0]));
-        //console.log("data[1] " + JSON.stringify(data[1]));
         const responseData = utils.buildResponse(
           data[0],
           true,
