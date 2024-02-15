@@ -151,6 +151,25 @@ const migrafile = async (req, res) => {
         } catch (error) {
           console.log(error.message);
         }
+      } else if (codigo == 2) {
+        try {
+          const result = await utils.executeQuery(
+            "INSERT INTO ppi (  ModificadoPor, CreadoPor,  Noficio, Fecha, TipoOficio, Dependencia, Descripcion, Importe) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+              req.body.P_CreadoPor,
+              req.body.P_CreadoPor,
+              row.OFICIO,
+              dayjs(row.FECHA, "MM/DD/YY").format("YYYY-MM-DD"),
+              row.TIPO,
+              row.DEPEDENCIA,
+              row.DESCRIPCION,
+              parseFloat(row.IMPORTE).toFixed(2),
+            ]
+          );
+          console.log("Insert successful:", result);
+        } catch (error) {
+          console.log(error.message);
+        }
       }
     });
 
