@@ -15,7 +15,14 @@ const {
 const { Login } = require("../controllers/Controller_Login.js");
 
 const { PPI } = require("../controllers/Controller_ppi.js");
-const { migrafile } = require("../controllers/Controller_Files.js");
+const { siregob } = require("../controllers/Controller_Siregob.js");
+const {
+  migrafile,
+  getFile,
+  saveFile,
+  createfolder,
+  getListFiles,
+} = require("../controllers/Controller_Files.js");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -30,6 +37,10 @@ router.get("/verify", (req, res) => {
 
 router.post("/PPI", (req, res) => {
   PPI(req, res);
+});
+
+router.post("/siregob", (req, res) => {
+  siregob(req, res);
 });
 
 router.post("/inapGralAll", (req, res) => {
@@ -52,6 +63,7 @@ router.post("/inapGral0103All", (req, res) => {
 router.post("/inapGral010301All", upload.single("file"), (req, res) => {
   inapGral010301All(req, res);
 });
+
 router.post("/adminfiles", (req, res) => {
   adminfiles(req, res);
 });
@@ -62,6 +74,14 @@ router.post("/saveFile", upload.single("file"), (req, res) => {
 
 router.post("/getFile", upload.single("file"), (req, res) => {
   getFile(req, res);
+});
+
+router.post("/createfolder", (req, res) => {
+  createfolder(req, res);
+});
+
+router.post("/getListFiles", (req, res) => {
+  getListFiles(req, res);
 });
 
 router.post("/migradata", upload.single("file"), (req, res) => {

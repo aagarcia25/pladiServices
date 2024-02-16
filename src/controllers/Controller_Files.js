@@ -5,11 +5,32 @@ const dayjs = require("dayjs");
 
 const ruta = process.env.APP_ROUTE_FILE;
 const xlsx = require("xlsx");
+
 const createFolderIfNotExists = async (folderPath) => {
   try {
     await fs.access(folderPath);
   } catch (error) {
     await fs.mkdir(folderPath, { recursive: true });
+  }
+};
+
+const createfolder = async (req, res) => {
+  try {
+    const folder = req.body.P_ROUTE; // Asegúrate de obtener el nombre del folder de la solicitud
+    if (!folder) {
+      throw new Error(
+        "No se proporcionó ningún nombre de carpeta en la solicitud."
+      );
+    }
+
+    const folderPath = `${ruta}/${folder}`;
+    await createFolderIfNotExists(folderPath);
+
+    const responseData = utils.buildResponse([], true, 200, "Exito");
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
   }
 };
 
@@ -190,4 +211,40 @@ const migrafile = async (req, res) => {
   }
 };
 
-module.exports = { saveFile, getFile, migrafile };
+const getListFiles = async (req, res) => {
+  try {
+    if (!req.body.P_ROUTE) {
+      throw new Error("No se proporcionó la ruta del archivo");
+    }
+
+    const folder = req.body.P_ROUTE;
+    const filePath = path.join(ruta, folder);
+
+    const content = await fs.readdir(filePath);
+
+    const filesAndDirectories = await Promise.all(
+      content.map(async (item) => {
+        const itemPath = path.join(filePath, item);
+        const stat = await fs.stat(itemPath);
+        return {
+          name: item,
+          isFile: stat.isFile(),
+          isDirectory: stat.isDirectory(),
+        };
+      })
+    );
+
+    const responseData = utils.buildResponse(
+      filesAndDirectories,
+      true,
+      200,
+      "Éxito"
+    );
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+module.exports = { saveFile, getFile, migrafile, createfolder, getListFiles };
