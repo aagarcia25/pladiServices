@@ -165,7 +165,7 @@ const migrafile = async (req, res) => {
               row.OFICIO,
               fechaInsertar,
               row.TIPO ? row.TIPO : null,
-              row.DEPEDENCIA ? row.DEPEDENCIA : null,
+              row.DEPENDENCIA ? row.DEPENDENCIA : null,
               row.DESCRIPCION ? row.DESCRIPCION : null,
               row.IMPORTE,
             ]
