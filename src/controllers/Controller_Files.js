@@ -153,17 +153,21 @@ const migrafile = async (req, res) => {
         }
       } else if (codigo == 2) {
         try {
+          const fechaInsertar = row.FECHA
+            ? dayjs(row.FECHA, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
           const result = await utils.executeQuery(
             "INSERT INTO ppi (  ModificadoPor, CreadoPor,  Noficio, Fecha, TipoOficio, Dependencia, Descripcion, Importe) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             [
               req.body.P_CreadoPor,
               req.body.P_CreadoPor,
               row.OFICIO,
-              dayjs(row.FECHA, "MM/DD/YY").format("YYYY-MM-DD"),
-              row.TIPO,
-              row.DEPEDENCIA,
-              row.DESCRIPCION,
-              parseFloat(row.IMPORTE).toFixed(2),
+              fechaInsertar,
+              row.TIPO ? row.TIPO : null,
+              row.DEPEDENCIA ? row.DEPEDENCIA : null,
+              row.DESCRIPCION ? row.DESCRIPCION : null,
+              row.IMPORTE,
             ]
           );
           console.log("Insert successful:", result);

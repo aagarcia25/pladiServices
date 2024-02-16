@@ -14,11 +14,8 @@ const {
 } = require("../controllers/Controller_InapGral.js");
 const { Login } = require("../controllers/Controller_Login.js");
 
-const {
-  saveFile,
-  getFile,
-  migrafile,
-} = require("../controllers/Controller_Files.js");
+const { PPI } = require("../controllers/Controller_ppi.js");
+const { migrafile } = require("../controllers/Controller_Files.js");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -29,6 +26,10 @@ router.post("/login", (req, res) => {
 
 router.get("/verify", (req, res) => {
   verify(req, res);
+});
+
+router.post("/PPI", (req, res) => {
+  PPI(req, res);
 });
 
 router.post("/inapGralAll", (req, res) => {
