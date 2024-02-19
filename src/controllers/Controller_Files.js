@@ -2,10 +2,9 @@ const utils = require("../utils/responseBuilder.js");
 const fs = require("fs").promises;
 const path = require("path");
 const dayjs = require("dayjs");
-
+const { v4: uuidv4 } = require("uuid");
 const ruta = process.env.APP_ROUTE_FILE;
 const xlsx = require("xlsx");
-
 const createFolderIfNotExists = async (folderPath) => {
   try {
     await fs.access(folderPath);
@@ -17,6 +16,7 @@ const createFolderIfNotExists = async (folderPath) => {
 const createfolder = async (req, res) => {
   try {
     const folder = req.body.P_ROUTE; // Asegúrate de obtener el nombre del folder de la solicitud
+    console.log(req.body);
     if (!folder) {
       throw new Error(
         "No se proporcionó ningún nombre de carpeta en la solicitud."
@@ -44,14 +44,14 @@ const saveFile = async (req, res) => {
 
     const contenido = req.file.buffer;
     const nombreArchivo = req.body.nombreArchivo;
+    const rutacarpeta = req.body.ruta;
 
     if (!nombreArchivo) {
       throw new Error(
         "El nombre del archivo no está especificado en la solicitud."
       );
     }
-
-    const rutaArchivo = path.join(rutaCarpeta, nombreArchivo);
+    const rutaArchivo = `${ruta}/${rutacarpeta}/${nombreArchivo}`;
     await fs.writeFile(rutaArchivo, contenido);
 
     const result = await utils.executeQuery("CALL sp_files(?,?,?,?,?,?)", [
@@ -96,13 +96,12 @@ const getFile = async (req, res) => {
     if (!req.body.P_NOMBRE) {
       throw new Error("No se proporcionó el nombre del archivo");
     }
-
-    const filePath = path.join(req.body.P_ROUTE);
-
+    const fileExtension = path.extname(req.body.P_NOMBRE);
+    const filePath = `${ruta}/${req.body.P_ROUTE}/${req.body.P_NOMBRE}`;
     const fileContent = await fs.readFile(filePath, { encoding: "base64" });
 
     const responseData = utils.buildResponse(
-      { FILE: fileContent, TIPO: ".pdf" },
+      { FILE: fileContent, TIPO: fileExtension },
       true,
       200,
       "Exito"
@@ -220,6 +219,8 @@ const getListFiles = async (req, res) => {
     const folder = req.body.P_ROUTE;
     const filePath = path.join(ruta, folder);
 
+    await createFolderIfNotExists(filePath);
+
     const content = await fs.readdir(filePath);
 
     const filesAndDirectories = await Promise.all(
@@ -227,10 +228,17 @@ const getListFiles = async (req, res) => {
         const itemPath = path.join(filePath, item);
         const stat = await fs.stat(itemPath);
         return {
+          id: uuidv4(),
           name: item,
           isFile: stat.isFile(),
           isDirectory: stat.isDirectory(),
         };
+      })
+    );
+    filesAndDirectories.sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
       })
     );
 
@@ -247,4 +255,76 @@ const getListFiles = async (req, res) => {
   }
 };
 
-module.exports = { saveFile, getFile, migrafile, createfolder, getListFiles };
+const deletedFile = async (req, res) => {
+  try {
+    if (!req.body.P_ROUTE) {
+      throw new Error("No se proporcionó la ruta del archivo");
+    }
+
+    if (!req.body.P_NOMBRE) {
+      throw new Error("No se proporcionó el nombre del archivo");
+    }
+
+    const filePath = `${ruta}/${req.body.P_ROUTE}/${req.body.P_NOMBRE}`;
+    await fs.unlink(filePath); // Elimina el archivo
+
+    const responseData = utils.buildResponse([], true, 200, "Exito");
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+const deletedFolder = async (req, res) => {
+  try {
+    if (!req.body.P_ROUTE) {
+      throw new Error("No se proporcionó la ruta del archivo");
+    }
+
+    const filePath = `${ruta}/${req.body.P_ROUTE}`;
+    const exists = await fs.stat(filePath);
+    if (exists.isDirectory()) {
+      await removeFolderRecursive(filePath);
+    } else {
+      throw new Error("La ruta proporcionada no es un directorio.");
+    }
+
+    const responseData = utils.buildResponse([], true, 200, "Exito");
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+// Función para eliminar directorios de manera recursiva
+const removeFolderRecursive = async (dir) => {
+  const contents = await fs.readdir(dir);
+
+  for (const content of contents) {
+    const contentPath = path.join(dir, content);
+    const stat = await fs.lstat(contentPath);
+
+    if (stat.isDirectory()) {
+      // Si es un directorio, llamar a la función recursivamente
+      await removeFolderRecursive(contentPath);
+    } else {
+      // Si es un archivo, eliminarlo
+      await fs.unlink(contentPath);
+    }
+  }
+
+  // Después de eliminar el contenido, eliminar el directorio en sí
+  await fs.rmdir(dir);
+};
+
+module.exports = {
+  saveFile,
+  getFile,
+  migrafile,
+  createfolder,
+  getListFiles,
+  deletedFile,
+  deletedFolder,
+};

@@ -22,6 +22,8 @@ const {
   saveFile,
   createfolder,
   getListFiles,
+  deletedFile,
+  deletedFolder,
 } = require("../controllers/Controller_Files.js");
 
 const storage = multer.memoryStorage();
@@ -76,12 +78,20 @@ router.post("/getFile", upload.single("file"), (req, res) => {
   getFile(req, res);
 });
 
-router.post("/createfolder", (req, res) => {
+router.post("/createfolder", upload.none(), (req, res) => {
   createfolder(req, res);
 });
 
 router.post("/getListFiles", (req, res) => {
   getListFiles(req, res);
+});
+
+router.post("/deletedFile", (req, res) => {
+  deletedFile(req, res);
+});
+
+router.post("/deletedFolder", (req, res) => {
+  deletedFolder(req, res);
 });
 
 router.post("/migradata", upload.single("file"), (req, res) => {
