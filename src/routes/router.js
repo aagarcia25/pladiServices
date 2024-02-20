@@ -24,6 +24,8 @@ const {
   getListFiles,
   deletedFile,
   deletedFolder,
+  busquedaGeneral,
+  getFileBusqueda,
 } = require("../controllers/Controller_Files.js");
 
 const storage = multer.memoryStorage();
@@ -96,6 +98,14 @@ router.post("/deletedFolder", (req, res) => {
 
 router.post("/migradata", upload.single("file"), (req, res) => {
   migrafile(req, res);
+});
+
+router.post("/busquedaGeneral", (req, res) => {
+  busquedaGeneral(req, res);
+});
+
+router.post("/getFileBusqueda", (req, res) => {
+  getFileBusqueda(req, res);
 });
 
 module.exports = router;

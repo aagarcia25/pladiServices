@@ -5,6 +5,36 @@ const dayjs = require("dayjs");
 const { v4: uuidv4 } = require("uuid");
 const ruta = process.env.APP_ROUTE_FILE;
 const xlsx = require("xlsx");
+const pdf = require("pdf-parse");
+
+const ListadoGlobalFiles = async (folderPath) => {
+  try {
+    const archivosPDF = [];
+
+    const content = await fs.readdir(folderPath);
+
+    for (const elemento of content) {
+      const rutaElemento = path.join(folderPath, elemento);
+      const stats = await fs.stat(rutaElemento);
+
+      if (stats.isDirectory()) {
+        // Si es una carpeta, llamamos recursivamente a la función para explorar subcarpetas
+        const archivosSubcarpeta = await ListadoGlobalFiles(rutaElemento);
+        archivosPDF.push(...archivosSubcarpeta);
+      } else if (stats.isFile() && elemento.toLowerCase().endsWith(".pdf")) {
+        // Si es un archivo PDF, lo agregamos a la lista
+        archivosPDF.push(rutaElemento);
+      }
+    }
+
+    return archivosPDF;
+  } catch (error) {
+    throw new Error(
+      "Error al obtener el listado global de archivos PDF: " + error.message
+    );
+  }
+};
+
 const createFolderIfNotExists = async (folderPath) => {
   try {
     await fs.access(folderPath);
@@ -98,6 +128,30 @@ const getFile = async (req, res) => {
     }
     const fileExtension = path.extname(req.body.P_NOMBRE);
     const filePath = `${ruta}/${req.body.P_ROUTE}/${req.body.P_NOMBRE}`;
+    const fileContent = await fs.readFile(filePath, { encoding: "base64" });
+
+    const responseData = utils.buildResponse(
+      { FILE: fileContent, TIPO: fileExtension },
+      true,
+      200,
+      "Exito"
+    );
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
+const getFileBusqueda = async (req, res) => {
+  try {
+    if (!req.body.P_ROUTE) {
+      throw new Error("No se proporcionó la ruta del archivo");
+    }
+
+    const fileExtension = req.body.P_TIPO;
+    const filePath = req.body.P_ROUTE;
+
     const fileContent = await fs.readFile(filePath, { encoding: "base64" });
 
     const responseData = utils.buildResponse(
@@ -319,6 +373,65 @@ const removeFolderRecursive = async (dir) => {
   await fs.rmdir(dir);
 };
 
+const busquedaGeneral = async (req, res) => {
+  try {
+    if (!req.body.SEARCH) {
+      throw new Error("No se proporcionó palabra búsqueda");
+    }
+
+    //const content = await fs.readdir(ruta);
+
+    const arrayfiles = await ListadoGlobalFiles(ruta);
+
+    console.log("Listado de Archivo");
+    console.log(arrayfiles);
+
+    const results = await Promise.all(
+      arrayfiles.map(async (archivoPDF) => {
+        const dataBuffer = await fs.readFile(archivoPDF);
+        const data = await pdf(dataBuffer);
+        // Accede al contenido del PDF
+        const pdfText = data.text;
+        // Realiza la búsqueda
+        const searchTermRegex = new RegExp(req.body.SEARCH, "gi");
+        const matches = pdfText.match(searchTermRegex);
+
+        if (matches) {
+          console.log(
+            `Se encontraron ${matches.length} ocurrencias de "${req.body.SEARCH}" en el PDF.`
+          );
+          console.log("Detalles de las ocurrencias:");
+          console.log(matches);
+          return {
+            id: uuidv4(),
+            type: "pdf",
+            name: path.basename(archivoPDF),
+            path: archivoPDF,
+            matches,
+          };
+        } else {
+          console.log(
+            `No se encontraron ocurrencias de "${req.body.SEARCH}" en el PDF.`
+          );
+        }
+      })
+    );
+
+    const filteredResults = results.filter((result) => result !== null);
+
+    const responseData = utils.buildResponse(
+      filteredResults,
+      true,
+      200,
+      "Éxito"
+    );
+    res.status(200).json(responseData);
+  } catch (error) {
+    const responseData = utils.buildResponse(null, false, 500, error.message);
+    res.status(500).json(responseData);
+  }
+};
+
 module.exports = {
   saveFile,
   getFile,
@@ -327,4 +440,6 @@ module.exports = {
   getListFiles,
   deletedFile,
   deletedFolder,
+  busquedaGeneral,
+  getFileBusqueda,
 };
