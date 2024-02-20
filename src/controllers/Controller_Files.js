@@ -390,9 +390,8 @@ const busquedaGeneral = async (req, res) => {
       arrayfiles.map(async (archivoPDF) => {
         const dataBuffer = await fs.readFile(archivoPDF);
         const data = await pdf(dataBuffer);
-        // Accede al contenido del PDF
         const pdfText = data.text;
-        // Realiza la búsqueda
+
         const searchTermRegex = new RegExp(req.body.SEARCH, "gi");
         const matches = pdfText.match(searchTermRegex);
 
@@ -405,6 +404,7 @@ const busquedaGeneral = async (req, res) => {
             matches,
           };
         }
+        return null; // Si no hay coincidencias, retorna null
       })
     );
 
