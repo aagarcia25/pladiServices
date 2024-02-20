@@ -397,11 +397,6 @@ const busquedaGeneral = async (req, res) => {
         const matches = pdfText.match(searchTermRegex);
 
         if (matches) {
-          console.log(
-            `Se encontraron ${matches.length} ocurrencias de "${req.body.SEARCH}" en el PDF.`
-          );
-          console.log("Detalles de las ocurrencias:");
-          console.log(matches);
           return {
             id: uuidv4(),
             type: "pdf",
@@ -409,10 +404,6 @@ const busquedaGeneral = async (req, res) => {
             path: archivoPDF,
             matches,
           };
-        } else {
-          console.log(
-            `No se encontraron ocurrencias de "${req.body.SEARCH}" en el PDF.`
-          );
         }
       })
     );
