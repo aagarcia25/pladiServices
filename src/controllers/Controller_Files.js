@@ -383,8 +383,8 @@ const busquedaGeneral = async (req, res) => {
 
     const arrayfiles = await ListadoGlobalFiles(ruta);
 
-    console.log("Listado de Archivo");
-    console.log(arrayfiles);
+    //console.log("Listado de Archivo");
+    //console.log(arrayfiles);
 
     const results = await Promise.all(
       arrayfiles.map(async (archivoPDF) => {
