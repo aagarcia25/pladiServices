@@ -15,6 +15,7 @@ const {
 const { Login } = require("../controllers/Controller_Login.js");
 
 const { PPI } = require("../controllers/Controller_ppi.js");
+const { PF } = require("../controllers/controller_pf.js");
 const { siregob } = require("../controllers/Controller_Siregob.js");
 const {
   migrafile,
@@ -41,6 +42,10 @@ router.get("/verify", (req, res) => {
 
 router.post("/PPI", (req, res) => {
   PPI(req, res);
+});
+
+router.post("/PF", (req, res) => {
+  PF(req, res);
 });
 
 router.post("/siregob", (req, res) => {
