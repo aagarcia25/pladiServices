@@ -6,7 +6,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // set up port
-const PORT = process.env.SRPU_B_APP_PORT || 8001;
+const PORT = 8585;
+const HOST = "0.0.0.0";
 app.use(express.json());
 app.use(cors());
 app.use(express.static("public"));
@@ -16,4 +17,7 @@ const router = require("./src/routes/router");
 app.use("/api/pladi", router);
 
 // run server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, HOST, () => {
+  const { address, port } = server.address();
+  console.log(`Server running on http://${address}:${port}`);
+});
