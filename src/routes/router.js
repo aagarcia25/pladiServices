@@ -13,7 +13,7 @@ const {
   adminfiles,
 } = require("../controllers/Controller_InapGral.js");
 const { Login } = require("../controllers/Controller_Login.js");
-
+const { AUDITORIA } = require("../controllers/Controller_Auditoria.js");
 const { PPI } = require("../controllers/Controller_ppi.js");
 const { PF } = require("../controllers/controller_pf.js");
 const { siregob } = require("../controllers/Controller_Siregob.js");
@@ -42,6 +42,10 @@ router.get("/verify", (req, res) => {
 
 router.post("/PPI", (req, res) => {
   PPI(req, res);
+});
+
+router.post("/AUDITORIA", (req, res) => {
+  AUDITORIA(req, res);
 });
 
 router.post("/PF", (req, res) => {

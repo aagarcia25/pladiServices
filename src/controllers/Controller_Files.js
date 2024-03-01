@@ -227,7 +227,7 @@ const migrafile = async (req, res) => {
         }
       } else if (codigo == 2) {
         try {
-          const fechaInsertar = row.FECHA
+          /* const fechaInsertar = row.FECHA
             ? dayjs(row.FECHA, "MM/DD/YY").format("YYYY-MM-DD")
             : null;
 
@@ -244,7 +244,87 @@ const migrafile = async (req, res) => {
               row.IMPORTE,
             ]
           );
-          console.log("Insert successful:", result);
+          console.log("Insert successful:", result);*/
+        } catch (error) {
+          console.log(error.message);
+        }
+      } else if (codigo == 3) {
+        try {
+          const fecha1 = row.ROW8
+            ? dayjs(row.ROW8, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+          const fecha2 = row.ROW9
+            ? dayjs(row.ROW9, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const fecha3 = row.ROW10
+            ? dayjs(row.ROW10, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const fecha4 = row.ROW11
+            ? dayjs(row.ROW11, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const fecha5 = row.ROW14
+            ? dayjs(row.ROW14, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const fecha6 = row.ROW17
+            ? dayjs(row.ROW17, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const fecha7 = row.ROW18
+            ? dayjs(row.ROW18, "MM/DD/YY").format("YYYY-MM-DD")
+            : null;
+
+          const query = `
+    INSERT INTO auditoria (
+        Folio,
+        OficioDependencia,
+        Secretaria,
+        Dependencia,
+        TipoGasto,
+        Responsable,
+        TipoSolicitud,
+        FechaOficio,
+        FechaRecepcion,
+        FechaElaboracion,
+        FechaVencimiento,
+        Monto,
+        Comentarios,
+        FechaTurno,
+        ObservacionesEstatus,
+        NumOficioContestacion,
+        FechaTurnada,
+        FechaTerminada,
+        ObsTerminada,
+        AutNoAut
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`;
+
+          const result = await utils.executeQuery(query, [
+            row.ROW1 ? row.ROW1 : null,
+            row.ROW2 ? row.ROW2 : null,
+            row.ROW3 ? row.ROW3 : null,
+            row.ROW4 ? row.ROW4 : null,
+            row.ROW5 ? row.ROW5 : null,
+            row.ROW6 ? row.ROW6 : null,
+            row.ROW7 ? row.ROW7 : null,
+            fecha1,
+            fecha2,
+            fecha3,
+            fecha4,
+            row.ROW12 ? row.ROW12 : null,
+            row.ROW13 ? row.ROW13 : null,
+            fecha5,
+            row.ROW15 ? row.ROW15 : null,
+            row.ROW16 ? row.ROW16 : null,
+            fecha6,
+            fecha7,
+            row.ROW19 ? row.ROW19 : null,
+            row.ROW20 ? row.ROW20 : null,
+          ]);
+          //console.log("Insert successful:", result);
         } catch (error) {
           console.log(error.message);
         }
