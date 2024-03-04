@@ -126,14 +126,8 @@ const getFile = async (req, res) => {
     if (!req.body.P_NOMBRE) {
       throw new Error("No se proporcionó el nombre del archivo");
     }
-
     const fileExtension = path.extname(req.body.P_NOMBRE);
     const filePath = `${ruta}/${req.body.P_ROUTE}/${req.body.P_NOMBRE}`;
-
-    // Validar si el archivo existe antes de intentar leerlo
-    if (!(await fs.exists(filePath))) {
-      throw new Error("El archivo no existe");
-    }
     const fileContent = await fs.readFile(filePath, { encoding: "base64" });
 
     const responseData = utils.buildResponse(
@@ -509,51 +503,6 @@ const busquedaGeneral = async (req, res) => {
   }
 };
 
-const getFileLarge = async (req, res) => {
-  try {
-    if (!req.body.P_ROUTE) {
-      throw new Error("No se proporcionó la ruta del archivo");
-    }
-
-    if (!req.body.P_NOMBRE) {
-      throw new Error("No se proporcionó el nombre del archivo");
-    }
-
-    const fileExtension = path.extname(req.body.P_NOMBRE);
-    const filePath = `${ruta}/${req.body.P_ROUTE}/${req.body.P_NOMBRE}`;
-
-    // Validar si el archivo existe antes de intentar leerlo
-    if (!(await fs.exists(filePath))) {
-      throw new Error("El archivo no existe");
-    }
-
-    // Configuración de headers para la descarga
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${req.body.P_NOMBRE}"`
-    );
-    res.setHeader("Content-Type", `application/${fileExtension.slice(1)}`);
-
-    // Crear un flujo de lectura para el archivo
-    const fileStream = fs.createReadStream(filePath);
-
-    // Manejar eventos de error y finalización del flujo
-    fileStream.on("error", (error) => {
-      throw new Error(`Error al leer el archivo: ${error.message}`);
-    });
-
-    fileStream.on("end", () => {
-      res.end();
-    });
-
-    // Piping del archivo al response
-    fileStream.pipe(res);
-  } catch (error) {
-    const responseData = utils.buildResponse(null, false, 500, error.message);
-    res.status(500).json(responseData);
-  }
-};
-
 module.exports = {
   saveFile,
   getFile,
@@ -564,5 +513,4 @@ module.exports = {
   deletedFolder,
   busquedaGeneral,
   getFileBusqueda,
-  getFileLarge,
 };
