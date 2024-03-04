@@ -1,12 +1,13 @@
 const mysql = require("mysql2");
 
 const db_connect = mysql.createConnection({
-  host: "database",
-  user: "pladiuser",
-  database: "PLADI",
-  password: "pladipassword",
+  //host: "database",
+  host: "10.200.4.176",
+  user: "root",
+  database: "pladi",
+  password: "root",
 });
-console.log(db_connect);
+//console.log(db_connect);
 db_connect.connect((err) => {
   if (err) {
     console.error("Error de conexión a la base de datos:", err);
