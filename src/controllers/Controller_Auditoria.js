@@ -2,8 +2,9 @@ const utils = require("../utils/responseBuilder.js");
 module.exports = {
   AUDITORIA: async (req, res) => {
     try {
-      const result = await utils.executeQuery("CALL sp_auditorias(?)", [
+      const result = await utils.executeQuery("CALL sp_auditorias(?,?)", [
         req.body.TIPO,
+        req.body.BUSQUEDA || "",
       ]);
 
       if (result.length > 2) {

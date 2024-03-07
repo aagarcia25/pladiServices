@@ -2,8 +2,9 @@ const utils = require("../utils/responseBuilder.js");
 module.exports = {
   PPI: async (req, res) => {
     try {
-      const result = await utils.executeQuery("CALL sp_ppi(?)", [
+      const result = await utils.executeQuery("CALL sp_ppi(?,?)", [
         req.body.TIPO,
+        req.body.BUSQUEDA || "",
       ]);
 
       if (result.length > 2) {

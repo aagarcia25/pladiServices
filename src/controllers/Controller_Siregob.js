@@ -3,8 +3,9 @@ const utils = require("../utils/responseBuilder.js");
 module.exports = {
   siregob: async (req, res) => {
     try {
-      const result = await utils.executeQuery("CALL sp_siregob(?)", [
+      const result = await utils.executeQuery("CALL sp_siregob(?,?)", [
         req.body.TIPO,
+        req.body.BUSQUEDA || "",
       ]);
 
       if (result.length > 2) {

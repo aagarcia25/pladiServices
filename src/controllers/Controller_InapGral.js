@@ -4,7 +4,7 @@ module.exports = {
   inapGralAll: async (req, res) => {
     try {
       const result = await utils.executeQuery(
-        "CALL sp_inapgral_CRUD(?,?,?,?,?,?)",
+        "CALL sp_inapgral_CRUD(?,?,?,?,?,?,?)",
         [
           req.body.TIPO,
           req.body.P_Id || null,
@@ -12,6 +12,7 @@ module.exports = {
           req.body.P_FechaConveniogrlinicio || null,
           req.body.P_FechaConveniogrlfin || null,
           req.body.P_NombreConvenio || null,
+          req.body.BUSQUEDA || "",
         ]
       );
 
