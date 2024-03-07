@@ -12,6 +12,7 @@ const { AUDITORIA } = require("../controllers/Controller_Auditoria.js");
 const { PPI } = require("../controllers/Controller_ppi.js");
 const { PF } = require("../controllers/controller_pf.js");
 const { siregob } = require("../controllers/Controller_Siregob.js");
+const { MPD } = require("../controllers/Controller_mpd.js");
 const {
   migrafile,
   getFile,
@@ -37,6 +38,10 @@ router.get("/verify", (req, res) => {
 
 router.post("/PPI", (req, res) => {
   PPI(req, res);
+});
+
+router.post("/MPD", (req, res) => {
+  MPD(req, res);
 });
 
 router.post("/AUDITORIA", (req, res) => {
