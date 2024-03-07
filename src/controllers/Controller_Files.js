@@ -3,7 +3,7 @@ const fs = require("fs").promises;
 const path = require("path");
 const dayjs = require("dayjs");
 const { v4: uuidv4 } = require("uuid");
-const ruta = "/app/PLADIFILES"; // Utiliza barras diagonales en lugar de barras invertidas
+const ruta = "C:\\PLADI"; //"/app/PLADIFILES"; // Utiliza barras diagonales en lugar de barras invertidas
 const xlsx = require("xlsx");
 const pdf = require("pdf-parse");
 
