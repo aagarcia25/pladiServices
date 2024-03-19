@@ -25,6 +25,8 @@ const {
   getFileBusqueda,
 } = require("../controllers/Controller_Files.js");
 
+const { presupuesto } = require("../controllers/Controller_presupuestos.js");
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
@@ -98,6 +100,10 @@ router.post("/busquedaGeneral", (req, res) => {
 
 router.post("/getFileBusqueda", (req, res) => {
   getFileBusqueda(req, res);
+});
+
+router.post("/presupuesto", (req, res) => {
+  presupuesto(req, res);
 });
 
 module.exports = router;
